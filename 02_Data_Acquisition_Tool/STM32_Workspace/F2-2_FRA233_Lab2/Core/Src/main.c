@@ -46,8 +46,6 @@ TIM_HandleTypeDef htim3;
 float W_n = 0.0, W_n1 = 0.0, W_n2 = 0.0; // Current and Past of W
 float V_n = 0.0, V_n1 = 0.0, V_n2 = 0.0; // Current and Past of V
 float c_Wn = 0.0, c_W1 = 0.0, c_W2 = 0.0, c_Vn = 0.0, c_V1 = 0.0, c_V2 = 0.0; // Coefficient
-int test_var = 0 ;
-int test_var_2wowowwo = 0 ;
 
 float R = 3.18f;
 float L = 0.0028445f;
