@@ -43,17 +43,20 @@
 TIM_HandleTypeDef htim3;
 
 /* USER CODE BEGIN PV */
+int Start_State = 0;
+int Last_State = 0;
+
 float W_n = 0.0, W_n1 = 0.0, W_n2 = 0.0; // Current and Past of W
 float V_n = 0.0, V_n1 = 0.0, V_n2 = 0.0; // Current and Past of V
 float c_Wn = 0.0, c_W1 = 0.0, c_W2 = 0.0, c_Vn = 0.0, c_V1 = 0.0, c_V2 = 0.0; // Coefficient
 
-float R = 3.18f;
-float L = 0.0028445f;
-float Bm = 0.000077581f;
-float Jm = 0.000058559f;
-float km = 0.0506f;
-float ke = 0.0528f;
-float Ts = 0.0002f;
+float R = 3.57f;
+float L = 0.003313f;
+float Bm = 0.00000214f;
+float Jm = 0.000011739f;
+float km = 0.049575f;
+float ke = 0.050668f;
+float Ts = 1.0f;
 
 float t = 0.0f;
 float freq_sine = 1.0f;
@@ -105,7 +108,7 @@ int main(void) {
 	MX_GPIO_Init();
 	MX_TIM3_Init();
 	/* USER CODE BEGIN 2 */
-	Init_Discrete_Model_ForwardDiscrete();
+	Init_Discrete_Model_TrapezoidalDiscrete();
 	HAL_TIM_Base_Start_IT(&htim3);
 	/* USER CODE END 2 */
 
@@ -115,6 +118,20 @@ int main(void) {
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
+		if (Start_State == 1 && Last_State == 0) {
+			t = 0.0f;
+			__HAL_TIM_SET_COUNTER(&htim3, 0);
+			HAL_TIM_Base_Start_IT(&htim3);
+			Last_State = 1;
+		}
+
+		else if (Start_State == 0 && Last_State == 1) {
+			HAL_TIM_Base_Stop_IT(&htim3);
+			t = 0.0f;
+			V_n = 0.0f;
+			W_n = 0.0f;
+			Last_State = 0;
+		}
 	}
 	/* USER CODE END 3 */
 }
@@ -134,12 +151,11 @@ void SystemClock_Config(void) {
 	/** Initializes the RCC Oscillators according to the specified parameters
 	 * in the RCC_OscInitTypeDef structure.
 	 */
-	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
-	RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-	RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
+	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+	RCC_OscInitStruct.HSEState = RCC_HSE_ON;
 	RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
-	RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
-	RCC_OscInitStruct.PLL.PLLM = RCC_PLLM_DIV4;
+	RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+	RCC_OscInitStruct.PLL.PLLM = RCC_PLLM_DIV6;
 	RCC_OscInitStruct.PLL.PLLN = 85;
 	RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
 	RCC_OscInitStruct.PLL.PLLQ = RCC_PLLQ_DIV2;
@@ -182,7 +198,7 @@ static void MX_TIM3_Init(void) {
 	htim3.Instance = TIM3;
 	htim3.Init.Prescaler = 1699;
 	htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-	htim3.Init.Period = 19;
+	htim3.Init.Period = 999;
 	htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
 	htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
 	if (HAL_TIM_Base_Init(&htim3) != HAL_OK) {
@@ -257,20 +273,45 @@ static void MX_GPIO_Init(void) {
 /* USER CODE BEGIN 4 */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	if (htim == &htim3) {
-		t += Ts;
-		if (t >= (1.0f / freq_sine)) {
-			t -= (1.0f / freq_sine);
+		if (Start_State == 1) {
+			t += Ts;
+			float delay_time = 1.0f ;
+
+			// Generate SineWave ----
+//			if (t >= (1.0f / freq_sine)) {
+//				t -= (1.0f / freq_sine);
+//			}
+//			V_n = amp_sine * sinf(2.0f * 3.1415926f * freq_sine * t);
+			// ----------------------
+			float slope = 1.0f;
+			if (t > delay_time){
+				V_n = slope * t;
+			}else{
+				V_n = 0;
+			}
+
+
+
+
+			if (V_n > 12.0f) {
+				V_n = 12.0f;
+			} else if (V_n < -12.0f) {
+				V_n = -12.0f;
+			}
+
+			// Memory Past State and Calculate Wn
+			W_n = (c_W1 * W_n1) + (c_W2 * W_n2) + (c_Vn * V_n) + (c_V1 * V_n1)
+					+ (c_V2 * V_n2);
+			W_n2 = W_n1;
+			W_n1 = W_n;
+			V_n2 = V_n1;
+			V_n1 = V_n;
+		} else {
+			t = 0.0f;
+			V_n = 0.0f;
+			W_n = 0.0f;
 		}
-		V_n = amp_sine * sinf(2.0f * 3.1415926f * freq_sine * t);
 
-		W_n = (c_W1 * W_n1) + (c_W2 * W_n2) + (c_Vn * V_n) + (c_V1 * V_n1)
-				+ (c_V2 * V_n2);
-
-		// Memory Past State
-		W_n2 = W_n1;
-		W_n1 = W_n;
-		V_n2 = V_n1;
-		V_n1 = V_n;
 	}
 }
 
