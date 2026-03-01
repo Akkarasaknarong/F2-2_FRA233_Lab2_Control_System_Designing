@@ -56,7 +56,7 @@ float Bm = 0.00000214f;
 float Jm = 0.000011739f;
 float km = 0.049575f;
 float ke = 0.050668f;
-float Ts = 0.01f;
+float Ts = 1.0f;
 
 float t = 0.0f;
 float freq_sine = 1.0f;
@@ -196,9 +196,9 @@ static void MX_TIM3_Init(void) {
 
 	/* USER CODE END TIM3_Init 1 */
 	htim3.Instance = TIM3;
-	htim3.Init.Prescaler = 1699;
+	htim3.Init.Prescaler = 16999;
 	htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-	htim3.Init.Period = 999;
+	htim3.Init.Period = 9999;
 	htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
 	htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
 	if (HAL_TIM_Base_Init(&htim3) != HAL_OK) {
@@ -275,7 +275,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	if (htim == &htim3) {
 		if (Start_State == 1) {
 			t += Ts;
-			float delay_time = 1.0f;
+			float delay_time = 0.0f;
 
 			// Generate SineWave ----
 //			if (t >= (1.0f / freq_sine)) {
@@ -284,8 +284,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 //			V_n = amp_sine * sinf(2.0f * 3.1415926f * freq_sine * t);
 			// ----------------------
 			float slope = 1.0f;
+//			if (t > delay_time) {
+//				V_n = slope * (t-1);
+//			} else {
+//				V_n = 0;
+//			}
+
 			if (t > delay_time) {
-				V_n = slope * (t-1);
+				V_n = slope * (t);
 			} else {
 				V_n = 0;
 			}
