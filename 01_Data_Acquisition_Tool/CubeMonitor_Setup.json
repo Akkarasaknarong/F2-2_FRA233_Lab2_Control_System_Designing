@@ -1,0 +1,1150 @@
+[
+    {
+        "id": "7b9ed63e.2138f8",
+        "type": "tab",
+        "label": "Basic_Flow",
+        "disabled": false,
+        "info": "# Basic flow to start with STM32CubeMonitor."
+    },
+    {
+        "id": "8381c865.236028",
+        "type": "subflow",
+        "name": "Single value",
+        "info": "The 'single value' subflow allows to extract data from processing node.\r\n\r\n * Filter Data to extract only one variable after the \"processing node\" step .\r\n * Modify the message to fit with standard widgets such as gauges.\r\n * Limit the number of messages to a maximum of 10 msg per second.\r\n\r\n### **Input**\r\n\r\nThe subflow 'single value' takes in input the `msg.payload`\r\nfrom the processing output. All the messages sent by the processing node have the same structure.\r\n\r\n    \"payload\": {\r\n        \"groupname\": \"Snapshot2\",\r\n        \"variabledata\": [\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            },\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            },\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            }\r\n        ],\r\n        \"variablename\": \"int2\"\r\n      }\r\n    }\r\n\r\n### **Filter on selected variable**\r\nSeveral messages are sent by the processing node for each variable, so the first step of this 'single value' subflow is to filter and keep only messages related to the selected variable.\r\nThe 'filter variable' node will only keep messages with the right `variablename` key.\r\n\r\n### **Extract duplets table**\r\n\r\nThe received message is an Object containing {groupname, variabledata[array], variablename}.  \r\nThe array contains two variables :\r\n - `y` the value \r\n - `x` the time\r\n\r\nA single message contains multiple pairs of values extract at a regular time interval.\r\nThe time interval depends on the acquisition frequency.\r\nWith the 'change' node and the `set` property, the `msg.payload` is set to \r\n`msg.payload.variabledata`, only the data variable array is set into msg.payload.\r\n\r\n    \"payload\": {\r\n        \"variabledata\": [\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            },\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            },\r\n            {\r\n                \"y\": \"9\",\r\n                \"x\": \"1567509421459\"\r\n            }\r\n        ]\r\n    }\r\n\r\n### **Split duplets table**\r\n\r\nThe data variable array is split with a length of one in smaller objects by the 'split' node.\r\nEach new object contains two subvariables : `y` and `x`.\r\n\r\n    \"payload\": {\r\n        \"y\": \"9\",\r\n        \"x\": \"1567509421459\"\r\n    }\r\n\r\n\r\n### **Limit the number of messages**\r\n\r\nThe 'delay' node allows to limit the maximum number of message per second.\r\nIn the 'single value' subflow, one message is extracted per second.\r\n\r\n>_Be careful, a dashboard saturation risk exists if too many messages are received per second._\r\n\r\n### **Extract only y values**\r\n\r\nThe `msg.payload` is set to `msg.payload.y` with the `set` property. \r\nOnly `y` variable is set into msg.payload as single value.\r\n\r\n    \"payload\": { \r\n        \"y\": \"9\" \r\n    }\r\n\r\n### **Output** \r\n\r\nSome widgets such as the gauge and the text node are using the `msg.payload` property.  \r\nThe output node is linked to a gauge that allows to see the evolution \r\nof the `y` variable as a function of time.\r\n\r\n\r\n![subflow_gauge](images/subflow_gauge.png)\r\n\r\n### **Details**\r\n\r\nNote : The debug node allows to see clearly and easily the \r\nmessage at the node output.  \r\n\r\n\r\n> More details on : [Node-Red](https://nodered.org/docs/user-guide/editor/workspace/subflows)\r\n\r\n\r\n-------\r\n\r\n",
+        "category": "",
+        "in": [
+            {
+                "x": 40,
+                "y": 60,
+                "wires": [
+                    {
+                        "id": "3c5ffe0d.9063b2"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 780,
+                "y": 140,
+                "wires": [
+                    {
+                        "id": "66397fd3.d8111",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [
+            {
+                "name": "varfilter",
+                "type": "str",
+                "value": "",
+                "ui": {
+                    "icon": "font-awesome/fa-filter",
+                    "label": {
+                        "en-US": "Variable"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "str"
+                        ]
+                    }
+                }
+            }
+        ],
+        "color": "#3CB4E6"
+    },
+    {
+        "id": "7e9c50ed.2ab67",
+        "type": "subflow",
+        "name": "Group variables in a .csv file",
+        "info": "",
+        "category": "STMicroelectronics",
+        "in": [
+            {
+                "x": 60,
+                "y": 80,
+                "wires": [
+                    {
+                        "id": "c7f149ae.894818"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 840,
+                "y": 360,
+                "wires": [
+                    {
+                        "id": "802c75f2.9f7898",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [
+            {
+                "name": "nbVar",
+                "type": "num",
+                "value": "",
+                "ui": {
+                    "icon": "font-awesome/fa-cogs",
+                    "label": {
+                        "en-US": "Number of Variables"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "num"
+                        ]
+                    }
+                }
+            },
+            {
+                "name": "delete_time",
+                "type": "bool",
+                "value": "false",
+                "ui": {
+                    "icon": "font-awesome/fa-clock-o",
+                    "label": {
+                        "en-US": "Single Time"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "bool"
+                        ]
+                    }
+                }
+            }
+        ],
+        "color": "#3CB4E6",
+        "icon": "node-red/join.svg"
+    },
+    {
+        "id": "91d68244.047e7",
+        "type": "subflow",
+        "name": "Select .csv variable",
+        "info": "",
+        "category": "STMicroelectronics",
+        "in": [
+            {
+                "x": 220,
+                "y": 120,
+                "wires": [
+                    {
+                        "id": "e9aa15c3.2c15f8"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 1180,
+                "y": 120,
+                "wires": [
+                    {
+                        "id": "d287b70e.45b4c8",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [
+            {
+                "name": "varfilter",
+                "type": "str",
+                "value": "",
+                "ui": {
+                    "icon": "font-awesome/fa-cog",
+                    "label": {
+                        "en-US": "Variable name"
+                    },
+                    "type": "input",
+                    "opts": {
+                        "types": [
+                            "str"
+                        ]
+                    }
+                }
+            }
+        ],
+        "color": "#3CB4E6",
+        "icon": "node-red/arrow-in.svg"
+    },
+    {
+        "id": "17d09b07.741a55",
+        "type": "ui_tab",
+        "name": "Home",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "22293a40.207896",
+        "type": "ui_base",
+        "theme": {
+            "name": "theme-light",
+            "lightTheme": {
+                "default": "#0094CE",
+                "baseColor": "#0094CE",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": true,
+                "reset": false
+            },
+            "darkTheme": {
+                "default": "#097479",
+                "baseColor": "#097479",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": false
+            },
+            "customTheme": {
+                "name": "Untitled Theme 1",
+                "default": "#4B7930",
+                "baseColor": "#4B7930",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+            },
+            "themeState": {
+                "base-color": {
+                    "default": "#0094CE",
+                    "value": "#0094CE",
+                    "edited": false
+                },
+                "page-titlebar-backgroundColor": {
+                    "value": "#0094CE",
+                    "edited": false
+                },
+                "page-backgroundColor": {
+                    "value": "#fafafa",
+                    "edited": false
+                },
+                "page-sidebar-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-textColor": {
+                    "value": "#1bbfff",
+                    "edited": false
+                },
+                "group-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "widget-textColor": {
+                    "value": "#111111",
+                    "edited": false
+                },
+                "widget-backgroundColor": {
+                    "value": "#0094ce",
+                    "edited": false
+                },
+                "widget-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "base-font": {
+                    "value": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+                }
+            },
+            "angularTheme": {
+                "primary": "indigo",
+                "accents": "blue",
+                "warn": "red",
+                "background": "grey"
+            }
+        },
+        "site": {
+            "name": "Node-RED Dashboard",
+            "hideToolbar": "false",
+            "allowSwipe": "false",
+            "lockMenu": "false",
+            "allowTempTheme": "true",
+            "dateFormat": "DD/MM/YYYY",
+            "sizes": {
+                "sx": 48,
+                "sy": 48,
+                "gx": 6,
+                "gy": 6,
+                "cx": 6,
+                "cy": 6,
+                "px": 0,
+                "py": 0
+            }
+        }
+    },
+    {
+        "id": "e9b89e09ea073fae",
+        "type": "probe",
+        "probeid": "0028002A3133511237363734",
+        "probename": "ST-Link v3 0028002A3133511237363734",
+        "protocol": "SWD",
+        "frequency": "24000 kHz",
+        "probeproperty": "{\"SWD\":[\"24000 kHz\",\"8000 kHz\",\"3300 kHz\",\"1000 kHz\",\"200 kHz\",\"50 kHz\",\"5 kHz\"],\"JTAG\":[\"21333 kHz\",\"16000 kHz\",\"12000 kHz\",\"8000 kHz\",\"1777 kHz\",\"750 kHz\"]}",
+        "probeversion": "ST Link firmware version V3.J16",
+        "connectionType": "p2p",
+        "nickname": "474RE"
+    },
+    {
+        "id": "1320b7de8cd4dd6d",
+        "type": "exe-config",
+        "name": "Variable",
+        "exefile": "C:\\Users\\Akkarasaknarong\\Documents\\GitHub\\F2-2_FRA233_Lab2_Control_System_Designing\\01_Data_Acquisition_Tool\\STM32_Workspace\\F2-2_FRA233_Lab2\\Debug\\F2-2_FRA233_Lab2.elf",
+        "exefolder": "C:\\Users\\Akkarasaknarong\\Documents\\GitHub\\F2-2_FRA233_Lab2_Control_System_Designing\\01_Data_Acquisition_Tool\\STM32_Workspace\\F2-2_FRA233_Lab2\\Debug",
+        "exevariablelist": [
+            {
+                "address": "0x080027d0",
+                "name": "AHBPrescTable[0]",
+                "type": 1
+            },
+            {
+                "address": "0x20000008",
+                "name": "Bm",
+                "type": 9
+            },
+            {
+                "address": "0x200000c0",
+                "name": "c_V1",
+                "type": 9
+            },
+            {
+                "address": "0x200000c4",
+                "name": "c_V2",
+                "type": 9
+            },
+            {
+                "address": "0x200000bc",
+                "name": "c_Vn",
+                "type": 9
+            },
+            {
+                "address": "0x200000b4",
+                "name": "c_W1",
+                "type": 9
+            },
+            {
+                "address": "0x200000b8",
+                "name": "c_W2",
+                "type": 9
+            },
+            {
+                "address": "0x200000b0",
+                "name": "c_Wn",
+                "type": 9
+            },
+            {
+                "address": "0x20000060",
+                "name": "htim3.Channel",
+                "type": 2
+            },
+            {
+                "address": "0x20000088",
+                "name": "htim3.ChannelNState[0]",
+                "type": 2
+            },
+            {
+                "address": "0x20000082",
+                "name": "htim3.ChannelState[0]",
+                "type": 2
+            },
+            {
+                "address": "0x2000008c",
+                "name": "htim3.DMABurstState",
+                "type": 2
+            },
+            {
+                "address": "0x20000064",
+                "name": "htim3.hdma[0]",
+                "type": 5
+            },
+            {
+                "address": "0x2000005c",
+                "name": "htim3.Init.AutoReloadPreload",
+                "type": 5
+            },
+            {
+                "address": "0x20000054",
+                "name": "htim3.Init.ClockDivision",
+                "type": 5
+            },
+            {
+                "address": "0x2000004c",
+                "name": "htim3.Init.CounterMode",
+                "type": 5
+            },
+            {
+                "address": "0x20000050",
+                "name": "htim3.Init.Period",
+                "type": 5
+            },
+            {
+                "address": "0x20000048",
+                "name": "htim3.Init.Prescaler",
+                "type": 5
+            },
+            {
+                "address": "0x20000058",
+                "name": "htim3.Init.RepetitionCounter",
+                "type": 5
+            },
+            {
+                "address": "0x20000044",
+                "name": "htim3.Instance",
+                "type": 5
+            },
+            {
+                "address": "0x20000080",
+                "name": "htim3.Lock",
+                "type": 2
+            },
+            {
+                "address": "0x20000081",
+                "name": "htim3.State",
+                "type": 2
+            },
+            {
+                "address": "0x2000000c",
+                "name": "Jm",
+                "type": 9
+            },
+            {
+                "address": "0x20000014",
+                "name": "ke",
+                "type": 9
+            },
+            {
+                "address": "0x20000010",
+                "name": "km",
+                "type": 9
+            },
+            {
+                "address": "0x20000004",
+                "name": "L",
+                "type": 9
+            },
+            {
+                "address": "0x20000094",
+                "name": "Last_State",
+                "type": 6
+            },
+            {
+                "address": "0x20000000",
+                "name": "R",
+                "type": 9
+            },
+            {
+                "address": "0x20000090",
+                "name": "Start_State",
+                "type": 6,
+                "checked": true
+            },
+            {
+                "address": "0x2000001c",
+                "name": "SystemCoreClock",
+                "type": 5
+            },
+            {
+                "address": "0x200000c8",
+                "name": "t",
+                "type": 9
+            },
+            {
+                "address": "0x20000018",
+                "name": "Ts",
+                "type": 9
+            },
+            {
+                "address": "0x200000cc",
+                "name": "uwTick",
+                "type": 5
+            },
+            {
+                "address": "0x20000024",
+                "name": "uwTickFreq",
+                "type": 5
+            },
+            {
+                "address": "0x20000020",
+                "name": "uwTickPrio",
+                "type": 5
+            },
+            {
+                "address": "0x200000a4",
+                "name": "V_n",
+                "type": 9,
+                "checked": true
+            },
+            {
+                "address": "0x200000a8",
+                "name": "V_n1",
+                "type": 9
+            },
+            {
+                "address": "0x200000ac",
+                "name": "V_n2",
+                "type": 9
+            },
+            {
+                "address": "0x20000098",
+                "name": "W_n",
+                "type": 9,
+                "checked": true
+            },
+            {
+                "address": "0x2000009c",
+                "name": "W_n1",
+                "type": 9
+            },
+            {
+                "address": "0x200000a0",
+                "name": "W_n2",
+                "type": 9
+            }
+        ],
+        "expand": false,
+        "filename": "F2-2_FRA233_Lab2.elf",
+        "exeModifiedTime": 1772390375479,
+        "configLastUpdate": 1772390427574
+    },
+    {
+        "id": "f9c34dde.1e2f4",
+        "type": "ui_group",
+        "name": "Chart",
+        "tab": "17d09b07.741a55",
+        "order": 1,
+        "disp": true,
+        "width": 15,
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "3c5ffe0d.9063b2",
+        "type": "switch",
+        "z": "8381c865.236028",
+        "name": "filter variable",
+        "property": "payload.variablename",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "varfilter",
+                "vt": "env"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 170,
+        "y": 60,
+        "wires": [
+            [
+                "4e5ba7a5.14dec8"
+            ]
+        ]
+    },
+    {
+        "id": "4e5ba7a5.14dec8",
+        "type": "change",
+        "z": "8381c865.236028",
+        "name": "keep only table of duplets",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.variabledata",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 430,
+        "y": 60,
+        "wires": [
+            [
+                "42bc6ed.5b20d9"
+            ]
+        ]
+    },
+    {
+        "id": "42bc6ed.5b20d9",
+        "type": "split",
+        "z": "8381c865.236028",
+        "name": "Split a table[1..n] of duplets in n msg of single duplet",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": 1,
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 800,
+        "y": 60,
+        "wires": [
+            [
+                "8b8ddb84.6fb208"
+            ]
+        ]
+    },
+    {
+        "id": "8b8ddb84.6fb208",
+        "type": "delay",
+        "z": "8381c865.236028",
+        "name": "",
+        "pauseType": "rate",
+        "timeout": "5",
+        "timeoutUnits": "seconds",
+        "rate": "10",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": true,
+        "outputs": 1,
+        "x": 200,
+        "y": 140,
+        "wires": [
+            [
+                "66397fd3.d8111"
+            ]
+        ]
+    },
+    {
+        "id": "66397fd3.d8111",
+        "type": "change",
+        "z": "8381c865.236028",
+        "name": "keep only value and delete timestamp",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.y",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 490,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7b54efc3.0009e",
+        "type": "function",
+        "z": "7e9c50ed.2ab67",
+        "name": "Associate values with same timestamp",
+        "func": "let i = 0;\nlet j = 0;\nlet n = 0;\nlet msg1; \nlet msgArray = new Array();\nlet nbVar = msg.payload.length;\n\nfor(i = 0; i < nbVar; i++){\n    \n    let underArrayLength = msg.payload[i].length;\n    \n    for(j = 0; j < underArrayLength; j++){\n            \n            for(n = 0; n < nbVar; n++){\n                msg1 = msg.payload[n][j];\n                msgArray.push(msg1);\n            }\n    }\n    msg.payload = msgArray;\n    return msg;\n}",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 650,
+        "y": 80,
+        "wires": [
+            [
+                "b3b24fdd.b01b9"
+            ]
+        ]
+    },
+    {
+        "id": "b3b24fdd.b01b9",
+        "type": "split",
+        "z": "7e9c50ed.2ab67",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": "${nbVar}",
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 870,
+        "y": 80,
+        "wires": [
+            [
+                "cf754130.7de2a"
+            ]
+        ]
+    },
+    {
+        "id": "ca91d405.238ea8",
+        "type": "function",
+        "z": "7e9c50ed.2ab67",
+        "name": "Format data",
+        "func": "let output=\"\";\n\nif(typeof msg.payload == 'number') {\n    output = msg.payload;\n    \n}else if(typeof msg.payload == 'string'){\n    output = msg.payload;\n}else{\n    output = msg.payload.x + \";\"+ msg.payload.y;\n}\n\nmsg.payload = output ;\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 790,
+        "y": 200,
+        "wires": [
+            [
+                "802c75f2.9f7898"
+            ]
+        ]
+    },
+    {
+        "id": "802c75f2.9f7898",
+        "type": "join",
+        "z": "7e9c50ed.2ab67",
+        "name": "Join consecutive messages from the number of monitored variables",
+        "mode": "custom",
+        "build": "string",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": ";",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "",
+        "count": "${nbVar}",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "",
+        "reduceFixup": "",
+        "x": 380,
+        "y": 360,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c7f149ae.894818",
+        "type": "join",
+        "z": "7e9c50ed.2ab67",
+        "name": "Join [nbVar] consecutives messages",
+        "mode": "custom",
+        "build": "array",
+        "property": "payload",
+        "propertyType": "msg",
+        "key": "topic",
+        "joiner": ";",
+        "joinerType": "str",
+        "accumulate": false,
+        "timeout": "",
+        "count": "${nbVar}",
+        "reduceRight": false,
+        "reduceExp": "",
+        "reduceInit": "",
+        "reduceInitType": "num",
+        "reduceFixup": "",
+        "x": 290,
+        "y": 80,
+        "wires": [
+            [
+                "7b54efc3.0009e"
+            ]
+        ]
+    },
+    {
+        "id": "cf754130.7de2a",
+        "type": "function",
+        "z": "7e9c50ed.2ab67",
+        "name": "Delete duplicate timestamps if user wants",
+        "func": "let i;\nlet delDup = env.get(\"delete_time\");\nlet nbVar = env.get(\"nbVar\");\nlet msgArray = new Array();\n\nif(delDup === false){\n    return msg;\n}else{\n    \n    msgArray.push(msg.payload[0]);\n    \n    for(i=1; i < nbVar; i++){\n        \n        msgArray.push(msg.payload[i].y);\n        \n    }\n    \n    msg.payload = msgArray;\n    return msg;\n    \n}\n\n\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 260,
+        "y": 200,
+        "wires": [
+            [
+                "91613227.a8eb8"
+            ]
+        ]
+    },
+    {
+        "id": "91613227.a8eb8",
+        "type": "split",
+        "z": "7e9c50ed.2ab67",
+        "name": "",
+        "splt": "\\n",
+        "spltType": "str",
+        "arraySplt": "1",
+        "arraySpltType": "len",
+        "stream": false,
+        "addname": "",
+        "x": 570,
+        "y": 200,
+        "wires": [
+            [
+                "ca91d405.238ea8"
+            ]
+        ]
+    },
+    {
+        "id": "d287b70e.45b4c8",
+        "type": "change",
+        "z": "91d68244.047e7",
+        "name": "keep only table of duplets",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.variabledata",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 950,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "e9aa15c3.2c15f8",
+        "type": "switch",
+        "z": "91d68244.047e7",
+        "name": "filter variable",
+        "property": "payload.variablename",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "varfilter",
+                "vt": "env"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 390,
+        "y": 120,
+        "wires": [
+            [
+                "c88ffe31.b60d9"
+            ]
+        ]
+    },
+    {
+        "id": "c88ffe31.b60d9",
+        "type": "function",
+        "z": "91d68244.047e7",
+        "name": "define the .csv header ",
+        "func": "if(msg.payload.variabledata[0].y === undefined){\n    msg.payload.variabledata[0].x = 'timestamp' + \"_\" +  msg.payload.variablename;\n    msg.payload.variabledata[0].y = msg.payload.variablename;\n    return msg;\n}else{\n    return msg;\n}\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 660,
+        "y": 120,
+        "wires": [
+            [
+                "d287b70e.45b4c8"
+            ]
+        ]
+    },
+    {
+        "id": "1ebbb430.dac7dc",
+        "type": "ui_chartst",
+        "z": "7b9ed63e.2138f8",
+        "group": "f9c34dde.1e2f4",
+        "name": "myChart",
+        "order": 4,
+        "width": 15,
+        "height": 9,
+        "chartType": "line",
+        "curveType": "linear",
+        "duration": "10",
+        "ymin": "",
+        "ymax": "",
+        "x": 1120,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "6013fb0b.5b7504",
+        "type": "acquisition out",
+        "z": "7b9ed63e.2138f8",
+        "name": "myProbe_Out",
+        "probeconfig": "e9b89e09ea073fae",
+        "x": 1120,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "4a573fb0.4bc99",
+        "type": "acquisition in",
+        "z": "7b9ed63e.2138f8",
+        "name": "myProbe_In",
+        "probeconfig": "e9b89e09ea073fae",
+        "x": 570,
+        "y": 340,
+        "wires": [
+            [
+                "a7c3e070.5a6c"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "d59587ff.cd1748",
+        "type": "variables",
+        "z": "7b9ed63e.2138f8",
+        "groupname": "Variables",
+        "accesspoint": "0",
+        "execonfig": "1320b7de8cd4dd6d",
+        "variablelist": [],
+        "triggerstartmode": "manual",
+        "triggername": "Start_State",
+        "triggerthreshold": "30000",
+        "frequency": "",
+        "frequencyType": "1000",
+        "snapshotheader": "",
+        "mode": "direct",
+        "lastImportedTime": 1772391120302,
+        "openStatus": true,
+        "x": 880,
+        "y": 220,
+        "wires": [
+            [
+                "6013fb0b.5b7504"
+            ],
+            [
+                "f14d0398.f1861"
+            ]
+        ]
+    },
+    {
+        "id": "f14d0398.f1861",
+        "type": "ui_toast",
+        "z": "7b9ed63e.2138f8",
+        "position": "top right",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": true,
+        "outputs": 0,
+        "ok": "OK",
+        "cancel": "",
+        "raw": false,
+        "className": "",
+        "topic": "",
+        "name": "",
+        "x": 1110,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "a7c3e070.5a6c",
+        "type": "processing",
+        "z": "7b9ed63e.2138f8",
+        "groupname": "Variables",
+        "groupid": "d59587ff.cd1748",
+        "expressions": [],
+        "statistics": [],
+        "logmode": "full",
+        "logformat": "csvc",
+        "x": 840,
+        "y": 340,
+        "wires": [
+            [
+                "1ebbb430.dac7dc"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "fc00295e.79ada8",
+        "type": "ui_button",
+        "z": "7b9ed63e.2138f8",
+        "name": "",
+        "group": "f9c34dde.1e2f4",
+        "order": 3,
+        "width": 5,
+        "height": 1,
+        "passthru": false,
+        "label": "Clear Graphs",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "clear",
+        "x": 1070,
+        "y": 440,
+        "wires": [
+            [
+                "1ebbb430.dac7dc"
+            ]
+        ]
+    },
+    {
+        "id": "1f938a09637584de",
+        "type": "inject",
+        "z": "7b9ed63e.2138f8",
+        "name": "Zero",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "write",
+        "payload": "{\"variablelist\":[{\"address\":\"0x20000098\",\"type\":6,\"value\":\"0\"}],\"accesspoint\":0}",
+        "payloadType": "json",
+        "x": 230,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "d71d0afb8370253a",
+        "type": "function",
+        "z": "7b9ed63e.2138f8",
+        "name": "Func_Start",
+        "func": "var msg1 = {\n    topic: \"write\",\n    payload: \n    {\n    \"variablelist\": [\n        {\n            \"address\": \"0x20000090\",\n            \"type\": 6,\n            \"value\": \"1\"\n        }\n    ],\n    \"accesspoint\": 0\n    }\n};\n\nvar msg2 = {\n    topic: \"start\"\n};\n\nreturn [msg1, msg2];",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 730,
+        "y": 120,
+        "wires": [
+            [
+                "6013fb0b.5b7504"
+            ],
+            [
+                "d59587ff.cd1748"
+            ]
+        ]
+    },
+    {
+        "id": "e3c9f181e3600682",
+        "type": "inject",
+        "z": "7b9ed63e.2138f8",
+        "name": "One",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "write",
+        "payload": "{\"variablelist\":[{\"address\":\"0x20000098\",\"type\":6,\"value\":\"1\"}],\"accesspoint\":0}",
+        "payloadType": "json",
+        "x": 230,
+        "y": 180,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b03a8dae3cfc4755",
+        "type": "ui_button",
+        "z": "7b9ed63e.2138f8",
+        "name": "",
+        "group": "f9c34dde.1e2f4",
+        "order": 0,
+        "width": 0,
+        "height": 0,
+        "passthru": false,
+        "label": "Start Collect Data",
+        "tooltip": "",
+        "color": "",
+        "bgcolor": "",
+        "className": "",
+        "icon": "",
+        "payload": "",
+        "payloadType": "str",
+        "topic": "topic",
+        "topicType": "msg",
+        "x": 510,
+        "y": 100,
+        "wires": [
+            [
+                "d71d0afb8370253a",
+                "ea31b13e86f290b8"
+            ]
+        ]
+    },
+    {
+        "id": "ea31b13e86f290b8",
+        "type": "delay",
+        "z": "7b9ed63e.2138f8",
+        "name": "",
+        "pauseType": "delay",
+        "timeout": "20",
+        "timeoutUnits": "seconds",
+        "rate": "1",
+        "nbRateUnits": "1",
+        "rateUnits": "second",
+        "randomFirst": "1",
+        "randomLast": "5",
+        "randomUnits": "seconds",
+        "drop": false,
+        "allowrate": false,
+        "outputs": 1,
+        "x": 520,
+        "y": 160,
+        "wires": [
+            [
+                "7d32a1fdef7a53fb"
+            ]
+        ]
+    },
+    {
+        "id": "7d32a1fdef7a53fb",
+        "type": "function",
+        "z": "7b9ed63e.2138f8",
+        "name": "Func_Stop",
+        "func": "var msg1 = {\n    topic: \"write\",\n    payload: \n    {\n    \"variablelist\": [\n        {\n            \"address\": \"0x20000090\",\n            \"type\": 6,\n            \"value\": \"0\"\n        }\n    ],\n    \"accesspoint\": 0\n    }\n};\n\nvar msg2 = {\n    topic: \"stop\"\n};\n\nreturn [msg1, msg2];",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 730,
+        "y": 160,
+        "wires": [
+            [
+                "6013fb0b.5b7504"
+            ],
+            [
+                "d59587ff.cd1748"
+            ]
+        ]
+    },
+    {
+        "id": "d68c6555a8937e71",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-dashboard": "3.6.5",
+            "@stm32/node-red-contrib-stm32cubemonitor": "2.5.0"
+        }
+    }
+]
