@@ -283,7 +283,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	if (htim == &htim3) {
 		if (Start_State == 1) {
 			t += Ts;
-			float delay_time = 1.0f;
 
 			// Generate SineWave ----
 //			if (t >= (1.0f / freq_sine)) {
@@ -292,17 +291,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 //			V_n = amp_sine * sinf(2.0f * 3.1415926f * freq_sine * t);
 			// ----------------------
 			float slope = 1.0f;
-			if (t > delay_time) {
-				V_n = slope * (t - 1);
+
+			float delay_time = 1.0f;
+			if (t >= delay_time) {
+				V_n = slope * (t - 0.999);
 			} else {
 				V_n = 0;
 			}
-
-//			if (t > delay_time) {
-//				V_n = slope * (t);
-//			} else {
-//				V_n = 0;
-//			}
 
 			if (V_n > 12.0f) {
 				V_n = 12.0f;
