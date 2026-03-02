@@ -109,7 +109,7 @@ int main(void)
   MX_GPIO_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
-	Init_Discrete_Model_TrapezoidalDiscrete();
+  Init_Discrete_Model_ForwardDiscrete();
 	HAL_TIM_Base_Start_IT(&htim3);
   /* USER CODE END 2 */
 
@@ -288,16 +288,16 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 //			if (t >= (1.0f / freq_sine)) {
 //				t -= (1.0f / freq_sine);
 //			}
-//			V_n = amp_sine * sinf(2.0f * 3.1415926f * freq_sine * t);
+			V_n = amp_sine * sinf(2.0f * 3.1415926f * freq_sine * t);
 			// ----------------------
-			float slope = 1.0f;
 
-			float delay_time = 1.0f;
-			if (t >= delay_time) {
-				V_n = slope * (t - 0.999);
-			} else {
-				V_n = 0;
-			}
+			//	float slope = 1.0f;
+			//	float delay_time = 1.0f;
+			//	if (t >= delay_time) {
+			//		V_n = slope * (t - 0.999);
+			//	} else {
+			//		V_n = 0;
+			//	}
 
 			if (V_n > 12.0f) {
 				V_n = 12.0f;
@@ -306,8 +306,17 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 			}
 
 			// Memory Past State and Calculate Wn
-			W_n = (c_W1 * W_n1) + (c_W2 * W_n2) + (c_Vn * V_n) + (c_V1 * V_n1)
-					+ (c_V2 * V_n2);
+			float Cal_Wn = (c_W1 * W_n1) + (c_W2 * W_n2) + (c_Vn * V_n)
+					+ (c_V1 * V_n1) + (c_V2 * V_n2);
+
+			if (Cal_Wn >= 237) {
+				W_n = 237;
+			} else if (Cal_Wn <= -237) {
+				W_n = -237;
+			} else {
+				W_n = Cal_Wn;
+			}
+
 			W_n2 = W_n1;
 			W_n1 = W_n;
 			V_n2 = V_n1;
