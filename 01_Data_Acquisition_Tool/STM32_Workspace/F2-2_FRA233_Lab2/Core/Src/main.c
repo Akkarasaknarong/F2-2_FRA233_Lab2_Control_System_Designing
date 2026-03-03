@@ -71,6 +71,7 @@ static void MX_TIM3_Init(void);
 void Init_Discrete_Model_ForwardDiscrete();
 void Init_Discrete_Model_BackwardDiscrete();
 void Init_Discrete_Model_TrapezoidalDiscrete();
+void Generate_Signal(int _input);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -109,7 +110,7 @@ int main(void)
   MX_GPIO_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
-  Init_Discrete_Model_ForwardDiscrete();
+  Init_Discrete_Model_TrapezoidalDiscrete();
 	HAL_TIM_Base_Start_IT(&htim3);
   /* USER CODE END 2 */
 
@@ -279,33 +280,43 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+void Generate_Signal(int _input) {
+	float delay_time = 0;
+
+	if (_input == 1) {
+		V_n = amp_sine * sinf(2.0f * 3.1415926f * freq_sine * t);
+	} else if (_input == 2) {
+		float slope = 1.0f;
+		delay_time = 1.0f;
+		if (t >= delay_time) {
+			V_n = slope * (t - 0.999);
+		} else {
+			V_n = 0;
+		}
+	} else if (_input == 3) {
+		delay_time = 10.0f;
+		if (t >= delay_time) {
+			V_n = 12;
+		} else {
+			V_n = 0;
+		}
+	}
+
+	if (V_n > 12.0f) {
+		V_n = 12.0f;
+	} else if (V_n < -12.0f) {
+		V_n = -12.0f;
+	}
+}
+
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	if (htim == &htim3) {
 		if (Start_State == 1) {
 			t += Ts;
 
-			// Generate SineWave ----
-//			if (t >= (1.0f / freq_sine)) {
-//				t -= (1.0f / freq_sine);
-//			}
-			V_n = amp_sine * sinf(2.0f * 3.1415926f * freq_sine * t);
-			// ----------------------
-
-			//	float slope = 1.0f;
-			//	float delay_time = 1.0f;
-			//	if (t >= delay_time) {
-			//		V_n = slope * (t - 0.999);
-			//	} else {
-			//		V_n = 0;
-			//	}
-
-			if (V_n > 12.0f) {
-				V_n = 12.0f;
-			} else if (V_n < -12.0f) {
-				V_n = -12.0f;
-			}
-
 			// Memory Past State and Calculate Wn
+			Generate_Signal(3);
+
 			float Cal_Wn = (c_W1 * W_n1) + (c_W2 * W_n2) + (c_Vn * V_n)
 					+ (c_V1 * V_n1) + (c_V2 * V_n2);
 
