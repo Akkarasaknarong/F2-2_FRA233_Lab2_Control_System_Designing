@@ -9,12 +9,12 @@
 clear; clc; close all;
 
 % ================= PARAMETERS =================
-motor_R = 3.69;
-motor_L = 0.04016;
-motor_Eff = 0.972957;
-motor_Ke = 0.050013;
-motor_J = 0.0000110153333;
-motor_B = 0.000025762333;
+% motor_R = 3.69;
+% motor_L = 0.04016;
+% motor_Eff = 0.972957;
+% motor_Ke = 0.050013;
+% motor_J = 0.0000110153333;
+% motor_B = 0.000025762333;
 
 fileCount = 3 ;
 RMSE_all     = zeros(fileCount,1);

@@ -50,12 +50,22 @@ float W_n = 0.0, W_n1 = 0.0, W_n2 = 0.0; // Current and Past of W
 float V_n = 0.0, V_n1 = 0.0, V_n2 = 0.0; // Current and Past of V
 float c_Wn = 0.0, c_W1 = 0.0, c_W2 = 0.0, c_Vn = 0.0, c_V1 = 0.0, c_V2 = 0.0; // Coefficient
 
-float R = 3.57f;
-float L = 0.003313f;
-float Bm = 0.00000214f;
-float Jm = 0.000011739f;
-float km = 0.049575f;
-float ke = 0.050668f;
+// G8 Parameter
+//float R = 3.57f;
+//float L = 0.003313f;
+//float Bm = 0.00000214f;
+//float Jm = 0.000011739f;
+//float km = 0.049575f;
+//float ke = 0.050668f;
+
+// TA Parameter
+float R = 3.18f;
+float L = 2.8445e-3f;
+float Bm = 77.581e-6f;
+float Jm = 58.559e-6f;
+float km = 50.6e-3f;
+float ke = 52.8e-3f;
+
 float Ts = 0.001f;
 
 float t = 0.0f;
@@ -110,7 +120,7 @@ int main(void)
   MX_GPIO_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
-  Init_Discrete_Model_TrapezoidalDiscrete();
+  Init_Discrete_Model_ForwardDiscrete();
 	HAL_TIM_Base_Start_IT(&htim3);
   /* USER CODE END 2 */
 
@@ -287,12 +297,40 @@ void Generate_Signal(int _input) {
 		V_n = amp_sine * sinf(2.0f * 3.1415926f * freq_sine * t);
 	} else if (_input == 2) {
 		float slope = 1.0f;
-		delay_time = 1.0f;
-		if (t >= delay_time) {
-			V_n = slope * (t - 0.999);
-		} else {
-			V_n = 0;
+
+		if (Ts == 1.0f) {
+			delay_time = 0.0f;
+			if (t >= delay_time) {
+				V_n = slope * (t - 0.0f);
+			} else {
+				V_n = 0;
+			}
 		}
+		if (Ts == 0.1f) {
+			delay_time = 1.0f;
+			if (t >= delay_time) {
+				V_n = slope * (t - 0.9f);
+			} else {
+				V_n = 0;
+			}
+		}
+		if (Ts == 0.01f) {
+			delay_time = 1.0f;
+			if (t >= delay_time) {
+				V_n = slope * (t - 0.99f);
+			} else {
+				V_n = 0;
+			}
+		}
+		if (Ts == 0.001f) {
+			delay_time = 1.0f;
+			if (t >= delay_time) {
+				V_n = slope * (t - 0.999f);
+			} else {
+				V_n = 0;
+			}
+		}
+
 	} else if (_input == 3) {
 		delay_time = 10.0f;
 		if (t >= delay_time) {
