@@ -44,7 +44,7 @@ fprintf('Model Loaded: %s\n', modelFile);
 %% ================= 2. PREPARE LOOP FOR REAL FILES =================
 % กำหนด Path ของไฟล์ Real Data
 basePath = 'C:\Users\Akkarasaknarong\Documents\GitHub\F2-2_FRA233_Lab2_Control_System_Designing\02_Raw_Experimental_Data\Part1 HIL DC Motor\Hardware in Loop\Ramp\Forward';
-filePrefix = 'Ramp_Forward_TIM_IT_1000Hz_rec'; % ส่วนต้นของชื่อไฟล์
+filePrefix = 'Ramp_Backward_TIM_IT_1Hz_rec'; % ส่วนต้นของชื่อไฟล์
 fileCount = 3; % จำนวนไฟล์ (Rec1, Rec2, Rec3)
 
 % สร้าง Figure รอไว้

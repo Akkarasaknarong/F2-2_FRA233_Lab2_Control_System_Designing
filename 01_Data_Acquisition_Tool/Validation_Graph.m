@@ -9,13 +9,6 @@
 clear; clc; close all;
 
 % ================= PARAMETERS =================
-% motor_R = 3.69;
-% motor_L = 0.04016;
-% motor_Eff = 0.972957;
-% motor_Ke = 0.050013;
-% motor_J = 0.0000110153333;
-% motor_B = 0.000025762333;
-
 fileCount = 3 ;
 RMSE_all     = zeros(fileCount,1);
 NRMSE_all    = zeros(fileCount,1);
@@ -24,7 +17,7 @@ ACC_all      = zeros(fileCount,1);
 
 %% ================= 1. LOAD MODEL (Reference) =================
 % ไฟล์ที่เป็น Main Reference (Model)
-modelFile = 'C:\Users\Akkarasaknarong\Documents\GitHub\F2-2_FRA233_Lab2_Control_System_Designing\02_Raw_Experimental_Data\Part1 HIL DC Motor\Simulink_model\Ramp.mat';
+modelFile = 'C:\Users\Akkarasaknarong\Documents\GitHub\F2-2_FRA233_Lab2_Control_System_Designing\02_Raw_Experimental_Data\Part1 HIL DC Motor\Real\Ramp\Real_Ramp_1.mat';
 f1 = load(modelFile);
 d1 = f1.data;
 
@@ -43,8 +36,8 @@ fprintf('Model Loaded: %s\n', modelFile);
 
 
 %% ================= 2. PREPARE LOOP FOR REAL FILES =================
-basePath   = 'C:\Users\Akkarasaknarong\Documents\GitHub\F2-2_FRA233_Lab2_Control_System_Designing\02_Raw_Experimental_Data\Part1 HIL DC Motor\Hardware in Loop\Ramp\Forward';
-filePrefix = 'Ramp_Forward_TIM_IT_1000Hz_rec';
+basePath   = 'C:\Users\Akkarasaknarong\Documents\GitHub\F2-2_FRA233_Lab2_Control_System_Designing\02_Raw_Experimental_Data\Part1 HIL DC Motor\Hardware in Loop\G8_Parameter\Ramp\Trapezoidal';
+filePrefix = 'Ramp_Trapezoidal_TIM_IT_1000Hz_rec';
 fileCount  = 3;
 
 % ===== กำหนดชื่อ Column ที่ต้องการ =====
