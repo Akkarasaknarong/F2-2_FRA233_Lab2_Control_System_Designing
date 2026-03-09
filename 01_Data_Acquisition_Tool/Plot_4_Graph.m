@@ -9,7 +9,7 @@ data4 = trapezoidal (.csv)
 clear; clc; close all;
 
 %% ================= FILE PATH =================
-data1 = 'C:\Users\Akkarasaknarong\Documents\GitHub\F2-2_FRA233_Lab2_Control_System_Designing\02_Raw_Experimental_Data\Part1 HIL DC Motor\Simulink_model\Sine.mat';
+data1 = 'C:\Users\Akkarasaknarong\Documents\GitHub\F2-2_FRA233_Lab2_Control_System_Designing\02_Raw_Experimental_Data\Part1 HIL DC Motor\Real\Sine\Real_Sine_1.mat';
 data2 = 'C:\Users\Akkarasaknarong\Documents\GitHub\F2-2_FRA233_Lab2_Control_System_Designing\02_Raw_Experimental_Data\Part1 HIL DC Motor\Hardware in Loop\G8_Parameter\Sine\Forward\Sine_Forward_TIM_IT_1000Hz_rec1.csv';
 data3 = 'C:\Users\Akkarasaknarong\Documents\GitHub\F2-2_FRA233_Lab2_Control_System_Designing\02_Raw_Experimental_Data\Part1 HIL DC Motor\Hardware in Loop\G8_Parameter\Sine\Backward\Sine_Backward_TIM_IT_1000Hz_rec1.csv';
 data4 = 'C:\Users\Akkarasaknarong\Documents\GitHub\F2-2_FRA233_Lab2_Control_System_Designing\02_Raw_Experimental_Data\Part1 HIL DC Motor\Hardware in Loop\G8_Parameter\Sine\Trapezoidal\Sine_Trapezoidal_TIM_IT_1000Hz_rec1.csv';
@@ -56,7 +56,7 @@ ylabel('Velocity (rad/s)', 'FontWeight', 'bold')
 title('Velocity Comparison (Numerical Differentiation Methods)')
 
 % อัปเดต Legend ตามลำดับ
-legend('Model (Raw)', 'Forward','Backward', 'Trapezoidal', 'Location', 'best')
+legend('Real_Signal', 'Forward','Backward', 'Trapezoidal', 'Location', 'best')
 set(gca, 'FontSize', 12)
 
 % --- (Optional) โค้ดสำหรับซูมดูกราฟ ---
