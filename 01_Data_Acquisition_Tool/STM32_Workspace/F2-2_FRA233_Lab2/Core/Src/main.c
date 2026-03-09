@@ -51,22 +51,22 @@ float V_n = 0.0, V_n1 = 0.0, V_n2 = 0.0; // Current and Past of V
 float c_Wn = 0.0, c_W1 = 0.0, c_W2 = 0.0, c_Vn = 0.0, c_V1 = 0.0, c_V2 = 0.0; // Coefficient
 
 // G8 Parameter
-//float R = 3.57f;
-//float L = 0.003313f;
-//float Bm = 0.00000214f;
-//float Jm = 0.000011739f;
-//float km = 0.049575f;
-//float ke = 0.050668f;
+float R = 3.57f;
+float L = 0.003313f;
+float Bm = 0.00000214f;
+float Jm = 0.000011739f;
+float km = 0.049575f;
+float ke = 0.050668f;
 
 // TA Parameter
-float R = 3.18f;
-float L = 2.8445e-3f;
-float Bm = 77.581e-6f;
-float Jm = 58.559e-6f;
-float km = 50.6e-3f;
-float ke = 52.8e-3f;
+//float R = 3.18f;
+//float L = 2.8445e-3f;
+//float Bm = 77.581e-6f;
+//float Jm = 58.559e-6f;
+//float km = 50.6e-3f;
+//float ke = 52.8e-3f;
 
-float Ts = 0.001f;
+float Ts = 0.0018f;
 
 float t = 0.0f;
 float freq_sine = 1.0f;
@@ -120,7 +120,7 @@ int main(void)
   MX_GPIO_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
-  Init_Discrete_Model_ForwardDiscrete();
+  Init_Discrete_Model_TrapezoidalDiscrete();
 	HAL_TIM_Base_Start_IT(&htim3);
   /* USER CODE END 2 */
 
@@ -214,7 +214,7 @@ static void MX_TIM3_Init(void)
   htim3.Instance = TIM3;
   htim3.Init.Prescaler = 16999;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 9;
+  htim3.Init.Period = 17;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
@@ -353,7 +353,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 			t += Ts;
 
 			// Memory Past State and Calculate Wn
-			Generate_Signal(3);
+			Generate_Signal(1);
 
 			float Cal_Wn = (c_W1 * W_n1) + (c_W2 * W_n2) + (c_Vn * V_n)
 					+ (c_V1 * V_n1) + (c_V2 * V_n2);
