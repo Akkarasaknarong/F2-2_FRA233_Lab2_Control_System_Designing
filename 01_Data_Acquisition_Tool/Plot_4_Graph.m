@@ -9,10 +9,10 @@ data4 = trapezoidal (.csv)
 clear; clc; close all;
 
 %% ================= FILE PATH =================
-data1 = 'C:\Users\Akkarasaknarong\Documents\GitHub\F2-2_FRA233_Lab2_Control_System_Designing\02_Raw_Experimental_Data\Part1 HIL DC Motor\Real\Sine\Real_Sine_1.mat';
-data2 = 'C:\Users\Akkarasaknarong\Documents\GitHub\F2-2_FRA233_Lab2_Control_System_Designing\02_Raw_Experimental_Data\Part1 HIL DC Motor\Hardware in Loop\G8_Parameter\Sine\Forward\Sine_Forward_TIM_IT_1000Hz_rec1.csv';
-data3 = 'C:\Users\Akkarasaknarong\Documents\GitHub\F2-2_FRA233_Lab2_Control_System_Designing\02_Raw_Experimental_Data\Part1 HIL DC Motor\Hardware in Loop\G8_Parameter\Sine\Backward\Sine_Backward_TIM_IT_1000Hz_rec1.csv';
-data4 = 'C:\Users\Akkarasaknarong\Documents\GitHub\F2-2_FRA233_Lab2_Control_System_Designing\02_Raw_Experimental_Data\Part1 HIL DC Motor\Hardware in Loop\G8_Parameter\Sine\Trapezoidal\Sine_Trapezoidal_TIM_IT_1000Hz_rec1.csv';
+data1 = 'C:\Users\Akkarasaknarong\Documents\GitHub\F2-2_FRA233_Lab2_Control_System_Designing\02_Raw_Experimental_Data\Part1 HIL DC Motor\Real\Step\Real_Step_1.mat';
+% data2 = 'C:\Users\Akkarasaknarong\Documents\GitHub\F2-2_FRA233_Lab2_Control_System_Designing\02_Raw_Experimental_Data\Part1 HIL DC Motor\Hardware in Loop\G8_Parameter\Step\Forward\Step_Forward_TIM_IT_1000Hz_rec1.csv';
+data3 = 'C:\Users\Akkarasaknarong\Documents\GitHub\F2-2_FRA233_Lab2_Control_System_Designing\02_Raw_Experimental_Data\Part1 HIL DC Motor\Hardware in Loop\G8_Parameter\Step\Backward\Step_Backward_TIM_IT_100Hz_rec1.csv';
+data4 = 'C:\Users\Akkarasaknarong\Documents\GitHub\F2-2_FRA233_Lab2_Control_System_Designing\02_Raw_Experimental_Data\Part1 HIL DC Motor\Hardware in Loop\G8_Parameter\Step\Trapezoidal\Step_Trapezoidal_TIM_IT_100Hz_rec1.csv';
 
 %% ================= LOAD MODEL (.mat) =================
 f1 = load(data1);
@@ -22,12 +22,12 @@ time_model = squeeze(d1{1}.Values.Time);
 velo_model = squeeze(d1{1}.Values.Data);
 
 %% ================= LOAD CSV =================
-T2 = readmatrix(data2);
+% T2 = readmatrix(data2);
 T3 = readmatrix(data3);
 T4 = readmatrix(data4);
 
-time_fwd = T2(:,1);
-velo_fwd = T2(:,3);
+% time_fwd = T2(:,1);
+% velo_fwd = T2(:,3);
 
 time_bwd = T3(:,1);
 velo_bwd = T3(:,3);
@@ -42,14 +42,13 @@ hold on
 grid on
 
 % 1. พล็อตเส้น Model ให้สีดำจางลง (โปร่งใส 30%) เพื่อไม่ให้บังข้อมูลอื่น
-plot(time_model, velo_model, 'Color', [0 0 0 0.3], 'LineWidth', 1.0)
-
+plot(time_model, velo_model, 'black', 'LineWidth', 0.8)
 % 2. พล็อตเส้น Forward, Backward ด้วยลักษณะเส้นที่ต่างกัน
-plot(time_fwd, velo_fwd, 'r--', 'LineWidth', 1.5) % เส้นประสีแดง
-plot(time_bwd, velo_bwd, 'g:', 'LineWidth', 2.0)  % เส้นจุดสีเขียว (เพิ่มความหนานิดนึงให้เห็นชัด)
+% plot(time_fwd, velo_fwd, 'r--', 'LineWidth', 1.5) % เส้นประสีแดง
+plot(time_bwd, velo_bwd, 'g', 'LineWidth', 2)  % เส้นจุดสีเขียว (เพิ่มความหนานิดนึงให้เห็นชัด)
 
 % 3. เส้น Trapezoidal ข้อมูลเรียบอยู่แล้ว ใช้เส้นทึบปกติได้
-plot(time_trp, velo_trp, 'b-', 'LineWidth', 1.2)
+plot(time_trp, velo_trp, 'b', 'LineWidth', 2)
 
 xlabel('Time (s)', 'FontWeight', 'bold')
 ylabel('Velocity (rad/s)', 'FontWeight', 'bold')
