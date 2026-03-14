@@ -2,14 +2,13 @@
 L = 0.1;     % [m]  (massless link)
 mp = 0.05;   % [kg] (point mass)
 g = 9.81;    % [m/s^2]
-% Motor Param from experiment [Default Parameter]
-kt = 0.05;
-ke = 0.05;
-Lm = 4e-3;
-R = 3;
-b = 1e-4;
-J = 7e-5;
-Tau = Lm/R;
+% Motor Param from experiment [TA Parameter]
+R = 3.18;
+Lm = 2.8445e-3;
+b = 77.581e-6;
+J = 58.559e-6;
+kt = 50.6e-3;
+ke = 52.8e-3;
 
 % Motor Param from experiment [G8 Parameter]
 % R = 3.57;
@@ -18,18 +17,13 @@ Tau = Lm/R;
 % J = 11.739e-6;
 % kt = 49.575e-3;
 % ke = 50.668e-3;
-% Tau = Lm/R;
 
+Tau = Lm/R;
 sampling_time = 0.001;
 
-Kp = 0.067 ;
+Kp = 0.1;
 
-% Motor Param from experiment [TEST Parameter]
-% R = 2.736;
-% Lm = 0.00296;
-% b = 0.00000835;
-% J = 0.00001474;
-% kt = 0.0302;
-% ke = 0.06974;
-% Tau = Lm/R;
-
+% PID Control
+% Kp = 0.5503680603820997 ;
+% Ki = 1.355252715606881e-20 ;
+% Kd = 0.2114551435512229 ;
