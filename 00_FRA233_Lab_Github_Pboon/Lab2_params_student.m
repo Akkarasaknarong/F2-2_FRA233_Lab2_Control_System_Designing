@@ -19,7 +19,7 @@ ke = 52.8e-3;
 % ke = 50.668e-3;
 
 Tau = Lm/R;
-sampling_time = 0.001;
+% sampling_time = 0.001;
 
 Kp = 0.1;
 
@@ -27,3 +27,10 @@ Kp = 0.1;
 % Kp = 0.5503680603820997 ;
 % Ki = 1.355252715606881e-20 ;
 % Kd = 0.2114551435512229 ;
+
+% Contol system design setup
+% J_eq = J + (mp*L*L);
+% num = [kt] ;
+% den = [J_eq*Lm , J_eq*R + Lm*b , R*b + kt*ke , 0];
+% G = tf(num,den);
+% controlSystemDesigner('rlocus',G);
