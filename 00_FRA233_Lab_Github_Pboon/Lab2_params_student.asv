@@ -4,7 +4,8 @@ mp = 0.05;   % [kg] (point mass)
 g = 9.81;    % [m/s^2]
 % Motor Param from experiment [TA Parameter]
 R = 3.18;
-Lm = 2.8445e-3;
+% Lm = 2.8445e-3;
+Lm = 1e-20;
 b = 77.581e-6;
 J = 58.559e-6;
 kt = 50.6e-3;
@@ -25,12 +26,10 @@ ke = 52.8e-3;
 % J  = 0.00001474; % Rotor inertia (kg.m^2)
 % b  = 0.00000835; % Viscous friction coefficient
 
-% Tau = Lm/R;
-Tau = 4e-04 ;
-% sampling_time = 0.001;
+Tau = Lm/R;
+% Tau = 4e-04 ;
 
-Kp = 0.5503680603820997;
-Ki = 1.355252715606881e-20 ;
+% Kp = 1.5;
 
 % PID Control
 % Kp = 0.5503680603820997 ;
@@ -41,5 +40,6 @@ Ki = 1.355252715606881e-20 ;
 % J_eq = J + (mp*L*L);
 % num = [kt] ;
 % den = [J_eq*Lm , J_eq*R + Lm*b , R*b + kt*ke , 0];
+% 
 % G = tf(num,den);
 % controlSystemDesigner('rlocus',G);

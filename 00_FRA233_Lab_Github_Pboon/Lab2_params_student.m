@@ -28,7 +28,7 @@ ke = 52.8e-3;
 Tau = Lm/R;
 % Tau = 4e-04 ;
 
-Kp = 0.5503680603820997;
+% Kp = 1.5;
 
 % PID Control
 % Kp = 0.5503680603820997 ;
@@ -39,5 +39,6 @@ Kp = 0.5503680603820997;
 % J_eq = J + (mp*L*L);
 % num = [kt] ;
 % den = [J_eq*Lm , J_eq*R + Lm*b , R*b + kt*ke , 0];
+% 
 % G = tf(num,den);
 % controlSystemDesigner('rlocus',G);
