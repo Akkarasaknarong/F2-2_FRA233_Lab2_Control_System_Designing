@@ -30,7 +30,7 @@ function f = Custom_Overshoot(sig)
         info = stepinfo(y_ready, t);
         
         % 5. ส่งค่า Overshoot กลับไปบอกโปรแกรมให้ "กดมันให้ต่ำที่สุด!"
-        f = info.Overshoot; 
+        f = info.Overshoot - 10; 
         
     catch 
         error('เพื่อน! เจาะข้อมูลไม่เข้าครับ เช็คชื่อตัวแปรด่วน!');
