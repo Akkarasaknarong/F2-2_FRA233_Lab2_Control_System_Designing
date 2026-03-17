@@ -25,8 +25,8 @@ ke = 52.8e-3;
 % J  = 0.00001474; % Rotor inertia (kg.m^2)
 % b  = 0.00000835; % Viscous friction coefficient
 
-Tau = Lm/R;
-% Tau = 0.0001 ;
+% Tau = Lm/R;
+Tau = 4e-04 ;
 % sampling_time = 0.001;
 
 Kp = 0.5503680603820997;

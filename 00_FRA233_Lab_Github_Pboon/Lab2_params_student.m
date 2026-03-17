@@ -26,11 +26,9 @@ ke = 52.8e-3;
 % b  = 0.00000835; % Viscous friction coefficient
 
 Tau = Lm/R;
-% Tau = 0.0001 ;
-% sampling_time = 0.001;
+% Tau = 4e-04 ;
 
 Kp = 0.5503680603820997;
-Ki = 1.355252715606881e-20 ;
 
 % PID Control
 % Kp = 0.5503680603820997 ;
