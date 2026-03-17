@@ -32,18 +32,17 @@ Tau = Lm/R;
 sampling_time = 0.001;
 %% PID Selection
 % Position_Contol Single loop (G8 Parameter)
-% Kp = 0.5503680603820997 ;
-% Ki = 1.355252715606881e-20 ;
+Kp = 0.5503680603820997 ;
+Ki = 1.355252715606881e-20 ;
 % Kd = 0.2114551435512229 ;
 
 % Cascade_Control TEST
-Kp_Posi = 0.55037;
-Ki_Posi = 1.3553e-20;
-Kd_Posi = 0.21146;
-
-Kp_Velo = 12.284;
-Ki_Velo = 1.3553e-20;
-Kd_Velo = 0.25018;
+% Kp_Posi = 0.55037;
+% Ki_Posi = 1.3553e-20;
+% Kd_Posi = 0.21146;
+% Kp_Velo = 12.284;
+% Ki_Velo = 1.3553e-20;
+% Kd_Velo = 0.25018;
 
 
 %% Contol system design setup
