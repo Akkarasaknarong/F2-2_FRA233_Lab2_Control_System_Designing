@@ -22,6 +22,7 @@ ke = 50.668e-3;
 Tau = Lm/R;
 
 sampling_time = 0.001;
+
 %% PID Selection
 % Position_Contol Single loop (G8 Parameter)
 % Kp = 0.5503680603820997 ;
@@ -29,17 +30,18 @@ sampling_time = 0.001;
 % Kd = 0.2114551435512229 ;
 
 % Cascade_Control G8
-Kp_Posi = 0.5503680603820997;
-Ki_Posi = 1.355252715606881e-20;
-Kd_Posi = 0.2114551435512229;
-Kp_Velo = 12.284;
-Ki_Velo = 1.3553e-20;
-Kd_Velo = 0.25018;
+% Kp_Posi = 0.5503680603820997;
+% Ki_Posi = 1.355252715606881e-20;
+% Kd_Posi = 0.2114551435512229;
+% 
+% Kp_Velo = 12.284;
+% Ki_Velo = 1.3553e-20;
+% Kd_Velo = 0.25018;
 
 
 %% Contol system design setup
-% J_eq = J + (mp*L*L);
-% num = [kt] ;
-% den = [J_eq*Lm , J_eq*R + Lm*b , R*b + kt*ke , kt];
-% G = tf(num,den);
-% controlSystemDesigner('rlocus',G);
+J_eq = J + (mp*L*L);
+num = [kt] ;
+den = [J_eq*Lm , J_eq*R + Lm*b , R*b + kt*ke , kt];
+G = tf(num,den);
+controlSystemDesigner('rlocus',G);
